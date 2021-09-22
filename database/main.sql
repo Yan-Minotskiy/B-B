@@ -12,7 +12,7 @@ d_port smallint
 data text
 arrival_time timestamp
 delivery_time time
-)
+);
 
 CREATE TABLE ip_location(
 id SERIAL NOT NULL PRIMARY KEY,
@@ -23,11 +23,6 @@ latitude point
 longitude point
 region varchar(100)
 city varchar(100)
-)
+);
 
-
-
-CREATE TABLE
-
-CREATE TABLE
 
