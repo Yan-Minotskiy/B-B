@@ -29,6 +29,20 @@ def gen_tabs(tabs):
         )
     return tab_list
 
+def gen_tabs_out(tabs):
+    tab_list_out = []
+    for i in range(len(tabs)):
+        tab_list_out.append(
+            dcc.Tab(
+                id="tab_out" + str(i),
+                label=tabs[i],
+                value="tab_out" + str(i),
+                className="custom-tab",
+                selected_className="custom-tab--selected",
+            )
+        )
+    return tab_list_out
+
 app = dash.Dash(
     __name__,
     meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],
@@ -90,8 +104,19 @@ app.layout = html.Div([
     html.Div([
         html.Div([
             html.Div([
-            html.H6("ИСХОДЯЩИЙ ТРАФИК", 
-            className="graph__title")]
+            html.H6("ИСХОДЯЩИЙ ТРАФИК", className="graph__title")]
+                        ),
+                        html.Div(
+                            id="tabs_out",
+                            className="tabs",
+                            children=[
+                                dcc.Tabs(
+                                    id="app-tabs2",
+                                    value="tab2",
+                                    className="custom-tabs",
+                                    children=gen_tabs_out(tabs),
+                                )
+                            ],
                         ),
                         dcc.Graph(
                             id="pass",
