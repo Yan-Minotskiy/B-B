@@ -40,11 +40,43 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.H6("ВХОДЯЩИЙ ТРАФИК", className="graph__title")]),
-                        dcc.Dropdown(
-                            id='xaxis-column',
-                            options=[{'label': i, 'value': i} for i in ['График скорости трафика', 'Доля source ip address', 'Карта входящего трафика']],
-                            value='График скорости трафика'
+                    html.Div(
+                            id="tabs",
+                            className="tabs",
+                            children=[
+                                dcc.Tabs(
+                                    id="app-tabs",
+                                    value="tab2",
+                                    className="custom-tabs",
+                                    children=[
+                                        dcc.Tab(
+                                            id="Speed-tab",
+                                            label="График скорости трафика",
+                                            value="tab1",
+                                            className="custom-tab",
+                                            selected_className="custom-tab--selected",
+                                        ),
+                                        dcc.Tab(
+                                            id="ip-tab",
+                                            label="Доля source ip address",
+                                            value="tab2",
+                                            className="custom-tab",
+                                            selected_className="custom-tab--selected",
+
+                                        ),
+                                        dcc.Tab(
+                                            id="map-tab",
+                                            label="Карта входящего трафика",
+                                            value="tab3",
+                                            className="custom-tab",
+                                            selected_className="custom-tab--selected",
+
+                                        ),
+                                    ],
+                                )
+                            ],
                         ),
+
                         dcc.Graph(
                             id="wind-speed",
                             figure=dict(
