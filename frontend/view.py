@@ -10,8 +10,24 @@ from dash.exceptions import PreventUpdate
 from dash.dependencies import Input, Output, State
 from scipy.stats import rayleigh
 
+tabs = ['График скорости трафика', 'Доля source ip address', "Карта входящего трафика"]
+
 
 GRAPH_INTERVAL = os.environ.get("GRAPH_INTERVAL", 5000)
+
+def gen_tabs(tabs):
+    tab_list = []
+    for i in range(len(tabs)):
+        tab_list.append(
+            dcc.Tab(
+                id="tab" + str(i),
+                label=tabs[i],
+                value="tab" + str(i),
+                className="custom-tab",
+                selected_className="custom-tab--selected",
+            )
+        )
+    return tab_list
 
 app = dash.Dash(
     __name__,
@@ -48,31 +64,7 @@ app.layout = html.Div([
                                     id="app-tabs",
                                     value="tab2",
                                     className="custom-tabs",
-                                    children=[
-                                        dcc.Tab(
-                                            id="Speed-tab",
-                                            label="График скорости трафика",
-                                            value="tab1",
-                                            className="custom-tab",
-                                            selected_className="custom-tab--selected",
-                                        ),
-                                        dcc.Tab(
-                                            id="ip-tab",
-                                            label="Доля source ip address",
-                                            value="tab2",
-                                            className="custom-tab",
-                                            selected_className="custom-tab--selected",
-
-                                        ),
-                                        dcc.Tab(
-                                            id="map-tab",
-                                            label="Карта входящего трафика",
-                                            value="tab3",
-                                            className="custom-tab",
-                                            selected_className="custom-tab--selected",
-
-                                        ),
-                                    ],
+                                    children=gen_tabs(tabs),
                                 )
                             ],
                         ),
