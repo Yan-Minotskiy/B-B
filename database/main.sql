@@ -17,8 +17,8 @@ id SERIAL NOT NULL PRIMARY KEY,
 ip inet,
 country varchar(100),
 country_code varchar(5),
-latitude point,
-longitude point,
+latitude real,
+longitude real,
 region varchar(100),
 city varchar(100)
 );
