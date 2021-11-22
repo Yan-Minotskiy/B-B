@@ -1,8 +1,9 @@
 import ipaddress
+import requests
 
 
 def valid_ip(address):
-    try: 
+    try:
         ipaddress.IPv4Address(address)
         return True
     except Exception:
@@ -18,4 +19,13 @@ def check_white_ip(ip_address):
             ipaddress.ip_network('192.168.0.0/16'),
             ipaddress.ip_network('100.64.0.0/10')
         ]
-        return not True in [ip_address in i for i in grey]
+        return not (True in [ip_address in i for i in grey])
+
+
+def what_geo(ip_address):
+    if check_white_ip(ip_address):
+        try:
+            r = requests.request(method='get', url=f'http://ip-api.com/json/{ip_address}')
+            return r.json()
+        except Exception:
+            return None
