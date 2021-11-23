@@ -5,11 +5,10 @@ s_mac macaddr,
 d_mac macaddr,
 s_ip inet,
 d_ip inet,
-s_port smallint,
-d_port smallint,
+s_port int,
+d_port int,
 data text,
 arrival_time timestamp,
-delivery_time time
 );
 
 CREATE TABLE ip_location(

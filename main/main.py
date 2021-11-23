@@ -30,7 +30,7 @@ def main():
                 if geo and geo['status'] != 'fail':
                     req = f"INSERT INTO ip_location (ip, country, country_code, latitude, longitude, region, city) VALUES ('{geo['query']}', '{geo['country']}', '{geo['countryCode']}', {geo['lat']}, '{geo['lon']}', '{geo['regionName']}', '{geo['city']}');"
                     cur.execute(req)
-        req = f"INSERT INTO frame (protocol, s_mac, d_mac, s_ip, d_ip) VALUES ('{packet.proto}', '{packet.src_mac}', '{packet.dest_mac}', {packet.src_ip}, {packet.dest_ip});"
+        req = f"INSERT INTO frame (protocol, s_mac, d_mac, s_ip, d_ip, s_port, d_port, data, arrival_time) VALUES ('{packet.proto}', '{packet.src_mac}', '{packet.dest_mac}', {packet.src_ip}, {packet.dest_ip}, {packet.src_port}, {packet.dest_port}, '{packet.data}', '{packet.arrival_time}');"
         cur.execute(req)
         conn.commit()
         cur.close()

@@ -23,9 +23,11 @@ def check_white_ip(ip_address):
 
 
 def what_geo(ip_address):
+    ip_address = ip_address[1:-1]
     if check_white_ip(ip_address):
         try:
             r = requests.request(method='get', url=f'http://ip-api.com/json/{ip_address}')
             return r.json()
-        except Exception:
+        except Exception as err:
+            print(err)
             return None

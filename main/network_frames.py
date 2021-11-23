@@ -1,7 +1,6 @@
 import socket
 import struct
-import textwrap
-import time
+from datetime import datetime
 
 
 def get_mac_address(byttes_addr: str) -> str:
@@ -80,8 +79,7 @@ class Packet:
         self.src_port = 'NULL'
         self.dest_port = 'NULL'
         self.data = ethernet.data
-        self.arrival_time = 'NULL'
-        self.delivery_time = 'NULL'
+        self.arrival_time = datetime.now()
         if ethernet.proto == 8:
             ipv4 = IPv4(ethernet.data)
             self.proto = ipv4.proto
@@ -101,6 +99,9 @@ class Packet:
                 self.data = tcp.data
             # UDP
             elif ipv4.proto == 17:
-                pass
-            else:
-                pass
+                udp = UDP(ipv4.data)
+                self.proto = 'udp'
+                self.src_port = udp.src_port
+                self.dest_port = udp.dest_port
+                self.data = udp.data
+        self.data = self.data.hex(':')
