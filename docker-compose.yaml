@@ -1,0 +1,29 @@
+version: "3.1"
+
+services:
+  db:
+    hostname: db
+    container_name: db
+    image: postgres:13
+    volumes:
+      - ./database/entrypoint:/docker-entrypoint-initdb.d
+      - ./database/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+
+  sniffer:
+    build: ./main/
+    command: python main.py
+    volumes:
+      - ./main/code:/code
+    environment:
+      - PYTHONUNBUFFERED=1
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+    restart: always
