@@ -73,3 +73,4 @@ docker-compose up
 6. [Psycopg](https://pypi.org/project/psycopg2/) (Используемый адаптер базы данных PostgreSQL для языка программирования Python)
 7. 
 
+
