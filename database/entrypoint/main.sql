@@ -23,9 +23,3 @@ CREATE TABLE ip_location
     region       varchar(100),
     city         varchar(100)
 );
-
--- ALTER TABLE frame
---     ADD FOREIGN KEY (s_ip) REFERENCES ip_location (id);
---
--- ALTER TABLE frame
---     ADD FOREIGN KEY (d_ip) REFERENCES ip_location (id);

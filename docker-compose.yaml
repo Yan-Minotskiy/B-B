@@ -39,8 +39,14 @@ services:
     command: python main.py
     volumes:
       - ./frontend/code:/code
+    environment:
+      - PYTHONUNBUFFERED=1
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
-      - "8050:8050"
+      - "80:8050"
     depends_on:
       - db
     networks:
