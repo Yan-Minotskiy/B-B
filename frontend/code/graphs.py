@@ -1,10 +1,39 @@
+import config
+from sqlalchemy import create_engine
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import config
 
-# карта трафика
+# устанавливаем соединение с базой данных
+engine = create_engine('postgresql://{}:{}@{}:{}/{}'.format(config.database["user"],
+                                                            config.database["password"],
+                                                            config.database["host"],
+                                                            config.database["port"],
+                                                            config.database["database"]))
 
+# импортируем данные из таблиц
+frame = pd.read_sql_table("frame", engine)
+ip_location = pd.read_sql_table("ip_location", engine)
+
+# вычисление показателей
+analyzed = frame.shape[0] #проанализировано
+input_traffic = 0 #TODO: вычислить
+output_traffic = 0 #TODO: вычислить
+
+#информация о протоколах подключения
+proto_count = frame.groupby('protocol').count()
+
+protocols = list(proto_count.index)
+count_protocols = list(proto_count.id)
+
+# Use `hole` to create a donut-like pie chart
+proto_pie = go.Figure(data=[go.Pie(labels=protocols, values=count_protocols, hole=.8)])
+
+
+
+
+
+"""
 fig_map = px.scatter_mapbox(config.example_for_maps, lat="Широта", lon="Долгота", hover_name="Ip адрес",
                             hover_data=["Страна", "Регион", "Город"],
                             color_discrete_sequence=["fuchsia"], zoom=3, height=700,
@@ -23,3 +52,4 @@ pie_country = go.Figure(go.Sunburst(
     values=[2, 1, 1, 1, 1],
 ))
 pie_country.update_layout(margin=dict(t=0, l=0, r=0, b=0))
+"""
