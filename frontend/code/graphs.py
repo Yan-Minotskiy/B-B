@@ -51,5 +51,5 @@ geo_pie = px.sunburst(merge_df, path=['country', 'region', 'city'])
 # карта трафика
 traffic_map = px.scatter_mapbox(merge_df, lat='latitude', lon='longitude', hover_name='ip', 
                                 hover_data=['country', 'region', 'city'], zoom=config.map_zoom, 
-                                center=config.map_center, height=900, color='protocol')
+                                center=config.map_center, color='protocol')
 traffic_map.update_layout(mapbox_style='open-street-map')
