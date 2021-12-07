@@ -10,21 +10,15 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div(children=[
     html.H1(children='Анализ сетевого трафика'),
-    html.Div(dcc.Graph(id="proto_pie", figure=graphs.proto_pie))
+    # html.P(children='Проанализировано ' + graphs.analyzed + ' пакетов'),
+    #tml.H2(children=graphs.input_traffic),
+    #html.H2(children=graphs.output_traffic),
+    #html.Div(children=[dcc.Graph(id='traffic_time', figure=graphs.traffic_time)]),
+    html.Div(children=[dcc.Graph(id="proto_pie", figure=graphs.proto_pie)]),
+    html.Div(children=[dcc.Graph(id="geo_pie", figure=graphs.geo_pie)]),
+    html.Div(children=[dcc.Graph(id='traffic_map', figure=graphs.traffic_map)])
+
 ])
 
 if __name__ == '__main__':
     app.run_server(debug=False, host='0.0.0.0')
-
-
-"""
-    html.Div(children=graphs.lst),
-    html.Div([
-        dcc.Graph(
-            id='example-graph1',
-            figure=graphs.fig_map),
-        dcc.Graph(
-            id='example-graph2',
-            figure=graphs.pie_country)
-    ], style={'columnCount': 2})
-    """
