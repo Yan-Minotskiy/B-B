@@ -1,42 +1,93 @@
 # library's
 import socket
-import psycopg2
+from os import environ
+from psycopg2 import connect
 
 # configs
 from config import database
 # locale file import
-from ipcheck import what_geo
+from ipcheck import what_geo, check_white_ip
 from network_frames import Packet
 
 
+def check_ip_in_database(cur, ip):
+    if check_white_ip(ip):
+        cur.execute('SELECT id FROM ip_location WHERE ip=%s', (ip,))
+        return not cur.fetchall()
+    return False
+
+
+def insert_into_ip_location(cur, geo):
+    req = 'INSERT INTO ip_location (ip, country, country_code, latitude, longitude, region, city) ' \
+          'VALUES (%s, %s, %s, %s, %s, %s, %s);'
+    params = (
+        str(geo['query']),
+        str(geo['country']),
+        str(geo['countryCode']),
+        float(geo['lat']),
+        float(geo['lon']),
+        str(geo['regionName']),
+        str(geo['city'])
+    )
+    cur.execute(req, params)
+
+
+def insert_into_frame(cur, packet):
+    req = 'INSERT INTO frame (arrival_time, protocol, s_mac, d_mac'
+    params = [str(packet.arrival_time), str(packet.proto), str(packet.src_mac), str(packet.dest_mac)]
+    if packet.src_ip:
+        req += ', s_ip'
+        params.append(str(packet.src_ip))
+    if packet.dest_ip:
+        req += ', d_ip'
+        params.append(str(packet.dest_ip))
+    if packet.src_port:
+        req += ', s_port'
+        params.append(int(packet.src_port))
+    if packet.dest_port:
+        req += ', d_port'
+        params.append(int(packet.dest_port))
+    if packet.data:
+        req += ', data'
+        params.append(str(packet.data))
+    req += ') VALUES (%s' + ', %s' * (len(params) - 1) + ');'
+    cur.execute(req, params)
+
+
 def main():
-    count = 0
-    conn = psycopg2.connect(**database)
+    conn = connect(**database)
     s = socket.socket(socket.PF_PACKET, socket.SOCK_RAW, socket.htons(0x0003))
     s.bind((INTERFACE, 0))
     while True:
         cur = conn.cursor()
-        count += 1
         bytes_packet, addr = s.recvfrom(65535)
         packet = Packet(bytes_packet)
         if packet.src_mac == packet.dest_mac:
             continue
-        if packet.src_ip != 'NULL':
-            if f"'{database['host']}'" in [packet.src_ip, packet.dest_ip]:
+        if packet.src_ip == API_IP or packet.dest_ip == API_IP:
+            continue
+        if packet.src_ip:
+            if database['host'] in [packet.src_ip, packet.dest_ip]:
                 continue
-            cur.execute(f"SELECT id FROM ip_location WHERE ip = {packet.src_ip}")
-            if not cur.fetchall():
+            if check_ip_in_database(cur, packet.src_ip):
                 geo = what_geo(packet.src_ip)
                 if geo and geo['status'] != 'fail':
-                    req = f"INSERT INTO ip_location (ip, country, country_code, latitude, longitude, region, city) VALUES ('{geo['query']}', '{geo['country']}', '{geo['countryCode']}', {geo['lat']}, '{geo['lon']}', '{geo['regionName']}', '{geo['city']}');"
-                    cur.execute(req)
-        req = f"INSERT INTO frame (protocol, s_mac, d_mac, s_ip, d_ip, s_port, d_port, data, arrival_time) VALUES ('{packet.proto}', '{packet.src_mac}', '{packet.dest_mac}', {packet.src_ip}, {packet.dest_ip}, {packet.src_port}, {packet.dest_port}, '{packet.data}', '{packet.arrival_time}');"
-        cur.execute(req)
+                    insert_into_ip_location(cur, geo)
+
+            if check_ip_in_database(cur, packet.dest_ip):
+                geo = what_geo(packet.dest_ip)
+                if geo and geo['status'] != 'fail':
+                    insert_into_ip_location(cur, geo)
+
+        insert_into_frame(cur, packet)
         conn.commit()
         cur.close()
 
 
 if __name__ == '__main__':
     PROTOCOLS = {num: name[8:] for name, num in vars(socket).items() if name.startswith('IPPROTO')}
-    INTERFACE = socket.if_nameindex()[1][1]
+    INTERFACE = environ.get('INTERFACE')
+    API_IP = socket.gethostbyname('ip-api.com')
+    if not INTERFACE:
+        INTERFACE = socket.if_nameindex()[1][1]
     main()

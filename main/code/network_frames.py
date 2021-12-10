@@ -1,4 +1,3 @@
-import socket
 import struct
 from datetime import datetime
 
@@ -19,7 +18,7 @@ class Ethernet:
         dest, src, prototype = struct.unpack('! 6s 6s H', data[:14])
         self.dest_mac = get_mac_address(dest)
         self.src_mac = get_mac_address(src)
-        self.proto = socket.htons(prototype)
+        self.proto = prototype
         self.data = data[14:]
 
 
@@ -74,17 +73,17 @@ class Packet:
         self.proto = ethernet.proto
         self.dest_mac = ethernet.dest_mac
         self.src_mac = ethernet.src_mac
-        self.src_ip = 'NULL'
-        self.dest_ip = 'NULL'
-        self.src_port = 'NULL'
-        self.dest_port = 'NULL'
+        self.src_ip = None
+        self.dest_ip = None
+        self.src_port = None
+        self.dest_port = None
         self.data = ethernet.data
         self.arrival_time = datetime.now()
-        if ethernet.proto == 8:
+        if ethernet.proto == 2048:
             ipv4 = IPv4(ethernet.data)
             self.proto = ipv4.proto
-            self.src_ip = f"'{ipv4.src}'"
-            self.dest_ip = f"'{ipv4.dest}'"
+            self.src_ip = ipv4.src
+            self.dest_ip = ipv4.dest
             # ICMP
             if ipv4.proto == 1:
                 icmp = ICMP(ipv4.data)
@@ -104,4 +103,26 @@ class Packet:
                 self.src_port = udp.src_port
                 self.dest_port = udp.dest_port
                 self.data = udp.data
+            if self.src_port == 80 or self.dest_port == 80:
+                self.proto = 'http'
+            elif self.src_port == 443 or self.dest_port == 443:
+                self.proto = 'https'
+            elif self.src_port == 53 or self.dest_port == 53:
+                self.proto = 'dns'
+            elif self.src_port == 23 or self.dest_port == 23:
+                self.proto = 'telnet'
+            elif self.src_port == 22 or self.dest_port == 22:
+                self.proto = 'ssh'
+            elif self.src_port == 21 or self.dest_port == 21:
+                self.proto = 'ftp'
+            elif self.src_port == 25 or self.dest_port == 25:
+                self.proto = 'smtp'
+
+        if self.proto == 2054:
+            self.proto = 'ARP'
+        elif self.proto == 34525:
+            self.proto = 'ipv6'
+
+        if type(self.proto) == int:
+            self.proto = hex(self.proto)
         self.data = self.data.hex(':')
