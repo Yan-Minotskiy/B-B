@@ -37,7 +37,6 @@ protocols = list(proto_count.index)
 count_protocols = list(proto_count.id)
 
 # Ip адреса
-# TODO: очистить таблицу от нашего ip адреса
 ip_count = frame.groupby('s_ip').count()
 
 # traffic_time = px.bar(frame, x='arrival_time')
@@ -45,11 +44,17 @@ ip_count = frame.groupby('s_ip').count()
 # круговая диагрмма протоколов
 proto_pie = go.Figure(data=[go.Pie(labels=protocols, values=count_protocols, hole=.5)])
 
+traffic_count = frame.groupby('type').count()
+types = list(traffic_count.index)
+count_traffic = list(traffic_count.id)
+
+traffic_pie = go.Figure(data=[go.Pie(labels=types, values=count_traffic, hole=.5)])
+
 #
 geo_pie = px.sunburst(merge_df, path=['country', 'region', 'city'])
 
 # карта трафика
 traffic_map = px.scatter_mapbox(merge_df, lat='latitude', lon='longitude', hover_name='ip',
                                 hover_data=['country', 'region', 'city'], zoom=config.map_zoom,
-                                center=config.map_center, color='protocol')
+                                center=config.map_center, color='protocol', height=800)
 traffic_map.update_layout(mapbox_style='open-street-map')

@@ -17,8 +17,8 @@ app.layout = html.Div([
     dcc.Tabs(id="tabs", value='stats', children=[
         dcc.Tab(label='Статистика', value='stats'),
         dcc.Tab(label='Протоколы', value='proto'),
-        dcc.Tab(label='IP адреса', value='ip_list'),
-        dcc.Tab(label='MAC адреса', value='mac_list'),
+        #dcc.Tab(label='IP адреса', value='ip_list'),
+        #dcc.Tab(label='MAC адреса', value='mac_list'),
         dcc.Tab(label='География', value='geo')
     ]),
     html.Div(id='tabs-content')
@@ -35,8 +35,8 @@ def render_content(tab):
                    style={
                        'font-weight': 'bold',
                        'text-align': 'center'
-                   }
-                   )
+                   }),
+            dcc.Graph(id='traffic_pie', figure=graphs.traffic_pie)
         ])
     elif tab == 'proto':
         return html.Div([
