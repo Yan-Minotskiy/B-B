@@ -9,7 +9,8 @@ CREATE TABLE frame
     s_port       int,
     d_port       int,
     data         text,
-    arrival_time timestamp
+    arrival_time timestamp,
+    type         varchar(10)
 );
 
 CREATE TABLE ip_location

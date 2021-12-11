@@ -2,6 +2,7 @@
 import socket
 from os import environ
 from psycopg2 import connect
+import netifaces as ni
 
 # configs
 from config import database
@@ -33,8 +34,14 @@ def insert_into_ip_location(cur, geo):
 
 
 def insert_into_frame(cur, packet):
-    req = 'INSERT INTO frame (arrival_time, protocol, s_mac, d_mac'
-    params = [str(packet.arrival_time), str(packet.proto), str(packet.src_mac), str(packet.dest_mac)]
+    if packet.src_ip == HOST_IP:
+        type = 'Исходящий'
+    elif packet.dest_ip == HOST_IP:
+        type = 'Входящий'
+    else:
+        type = 'Транзитный'
+    req = 'INSERT INTO frame (type, arrival_time, protocol, s_mac, d_mac'
+    params = [type, str(packet.arrival_time), str(packet.proto), str(packet.src_mac), str(packet.dest_mac)]
     if packet.src_ip:
         req += ', s_ip'
         params.append(str(packet.src_ip))
@@ -90,4 +97,5 @@ if __name__ == '__main__':
     API_IP = socket.gethostbyname('ip-api.com')
     if not INTERFACE:
         INTERFACE = socket.if_nameindex()[1][1]
+    HOST_IP = ni.ifaddresses(INTERFACE)[ni.AF_INET][0]['addr']
     main()
