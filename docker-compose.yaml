@@ -1,0 +1,61 @@
+version: "3.1"
+
+services:
+  db:
+    hostname: db
+    container_name: db
+    image: postgres:13
+    volumes:
+      - ./database/entrypoint:/docker-entrypoint-initdb.d
+      - ./database/data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    expose:
+      - "5432"
+    networks:
+      internal:
+        ipv4_address: 192.168.50.2
+
+  sniffer:
+    build: ./main/
+    command: python main.py
+    volumes:
+      - ./main/code:/code
+    environment:
+      - PYTHONUNBUFFERED=1
+      - POSTGRES_HOST=192.168.50.2
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    depends_on:
+      - db
+    network_mode: host
+    restart: always
+
+  frontend:
+    build: ./frontend/
+    command: python main.py
+    volumes:
+      - ./frontend/code:/code
+    environment:
+      - PYTHONUNBUFFERED=1
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "80:8050"
+    depends_on:
+      - db
+    networks:
+      - internal
+#    restart: always
+
+networks:
+  internal:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.50.0/24
